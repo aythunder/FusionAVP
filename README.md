@@ -13,3 +13,5 @@ The code and dataset of FusionAVP are available here for academic exchange and l
 - [AVP_manual_feature.py]: We provide code here for extracting conventional features, including AAindex, one-hot encoding, and BLOSUM62, which can be modified as needed.
 - [AVP_LLM_feature.py]: We built the model architecture using PyTorch and used PeptideDataset for data loading.
 - [AVP_LLM_feature.py]: We provide code for evaluating the performance of the model.
+# Reference
+[1] Aoyun Geng, Jinwei Wang, Chunyan Cui, Yuanhao Li, Zilong Zhang, Junlin Xu, Yajie Meng, Leyi Wei, Quan Zou, Tao Wang, Feifei Cui.FusionAVP: A Cross-Attention- Based Multimodal Fusion and Contrastive Learning Strategy for Antiviral Peptide Identification
