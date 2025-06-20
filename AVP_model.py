@@ -6,7 +6,6 @@ from torch.utils.data import Dataset
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-# 注意力机制
 class SelfAttention(nn.Module):
     def __init__(self, hid_dim, dropout=0.2):
         super().__init__()
@@ -25,26 +24,16 @@ class SelfAttention(nn.Module):
         K = self.w_k(key)
         V = self.w_v(value)
 
-        # Q, K, V = [batch size, sent len, hid dim]
         energy = torch.matmul(Q, K.permute(0, 2, 1)) / self.scale
-
-        # energy = [batch size, sent len_Q, sent len_K]
-        # 序列是填充的就需要使用到mask矩阵，softmax会将输入值进行归一化，非常小的值指数化结果接近于0
-        # 从而在归一化后，注意力权重也会是0
         expanded_mask = mask.unsqueeze(-1).expand(-1, -1, energy.shape[2])
         if mask is not None:
             energy = energy.masked_fill(expanded_mask == 0, -1e10)
 
         attention = self.do(F.softmax(energy, dim=-1))
-        # attention = [batch size, sent len_Q, sent len_K]
         x = torch.matmul(attention, V)
-        # x = [batch size, sent len_Q, hid dim]
         x = self.fc(x)
-        # x = [batch size, sent len_Q, hid dim]
         return x
 
-
-# 对比损失的计算
 class ContrastiveModel(torch.nn.Module):
     def __init__(self, num_hidden: int, num_proj_hidden: int, tau: float = 0.5):
         super().__init__()
@@ -74,15 +63,6 @@ class ContrastiveModel(torch.nn.Module):
         z2 = F.normalize(z2, dim=-1)
         return torch.einsum('bld,bmd->blm', z1, z2)
 
-    # def semi_loss(self, z1: torch.Tensor, z2: torch.Tensor):
-    #     f = lambda x: torch.exp(x / self.tau)
-    #     refl_sim = f(self.sim(z1, z1))
-    #     between_sim = f(self.sim(z1, z2))
-    #     return -torch.log(
-    #         between_sim.diag()
-    #         / (refl_sim.sum(dim=2) + between_sim.sum(dim=2) - refl_sim.diag())
-    #     ).sum(dim=1)
-
     def semi_loss(self, z1: torch.Tensor, z2: torch.Tensor):
         f = lambda x: torch.exp(x / self.tau)
         refl_sim = f(self.sim(z1, z1))
@@ -106,26 +86,13 @@ class MLPClassifier(nn.Module):
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
-        # normal
-        # x = torch.mean(x, dim=1)  # [batch_size, embedding]
-        # x = F.relu(self.fc1(x))
-        # x = self.dropout(x)
-        # # x = F.relu(self.fc2(x))
-        # # x = self.dropout(x)
-        # x = self.fc2(x)
-        # x = self.sigmoid(x)
-        # return x
-
-        # return embedding
+   
         x = torch.mean(x, dim=1)  # [batch_size, embedding]
-        x_1 = F.relu(self.fc1(x))
-
-        x_2 = self.dropout(x_1)
-        # x = F.relu(self.fc2(x))
-        # x = self.dropout(x)
-        x = self.fc2(x_2)
+        x = F.relu(self.fc1(x))
+        x = self.dropout(x)
+        x = self.fc2(x)
         x = self.sigmoid(x)
-        return x, x_1, x_2
+        return x,
 
 
 class Model(nn.Module):
