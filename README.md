@@ -9,4 +9,7 @@ The code and dataset of FusionAVP are available here for academic exchange and l
 1.Download the source code from this repository.
 2.Download the pretrained protein language model from huggingface.For example: https://huggingface.co/facebook/esm1v_t33_650M_UR90S_1/tree/main
 # Runing
-- [Train.]: 
+- [AVP_LLM_feature.py]: We provide code here for extracting features from ESM and BERT-based large-scale models, which can be modified as needed.
+- [AVP_manual_feature.py]: We provide code here for extracting conventional features, including AAindex, one-hot encoding, and BLOSUM62, which can be modified as needed.
+- [AVP_LLM_feature.py]: We built the model architecture using PyTorch and used PeptideDataset for data loading.
+- [AVP_LLM_feature.py]: We provide code for evaluating the performance of the model.
